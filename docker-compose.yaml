@@ -1,7 +1,7 @@
 version: "3.3"
 services:
-  mongo:
-    container_name: "mongo"
+  db:
+    container_name: "mongodb"
     image: mongo
     restart: always
     ports:
@@ -10,6 +10,11 @@ services:
     image: mongo-express
     restart: always
     depends_on:
-      - mongo
+      - db
     ports:
       - 8081:8081
+  redis:
+    image: redis:7.0-rc-alpine3.15
+    restart: always
+    ports:
+      - '6379:6379'
