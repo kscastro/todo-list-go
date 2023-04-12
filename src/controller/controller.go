@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -9,16 +10,28 @@ import (
 	"github.com/kscastro/todo-list-go/src/model"
 )
 
-func GetAllTask(w http.ResponseWriter, r *http.Request) {
+type TaskController struct {
+	db database.TaskRepository
+}
+
+func NewTaskController(db database.TaskRepository) (*TaskController, error) {
+	if db == nil {
+		return nil, fmt.Errorf("Nil Repository")
+	}
+
+	return &TaskController{db}, nil
+}
+
+func (t TaskController) GetAllTask(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	payload := database.GetAllTask()
+	payload := t.db.GetAllTask()
 	json.NewEncoder(w).Encode(payload)
 }
 
-func CreateTask(w http.ResponseWriter, r *http.Request) {
+func (t TaskController) CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -27,11 +40,11 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	var task model.TodoList
 	_ = json.NewDecoder(r.Body).Decode(&task)
-	database.InsertOneTask(task)
+	t.db.InsertOneTask(task)
 	json.NewEncoder(w).Encode(task)
 }
 
-func TaskComplete(w http.ResponseWriter, r *http.Request) {
+func (t TaskController) TaskComplete(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -39,11 +52,11 @@ func TaskComplete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 	params := mux.Vars(r)
-	database.TaskComplete(params["id"])
+	t.db.TaskComplete(params["id"])
 	json.NewEncoder(w).Encode(params["id"])
 }
 
-func UndoTask(w http.ResponseWriter, r *http.Request) {
+func (t TaskController) UndoTask(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -51,11 +64,11 @@ func UndoTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 	params := mux.Vars(r)
-	database.UndoTask(params["id"])
+	t.db.UndoTask(params["id"])
 	json.NewEncoder(w).Encode(params["id"])
 }
 
-func DeleteTask(w http.ResponseWriter, r *http.Request) {
+func (t TaskController) DeleteTask(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -63,17 +76,17 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 	params := mux.Vars(r)
-	database.DeleteOneTask(params["id"])
+	t.db.DeleteOneTask(params["id"])
 	json.NewEncoder(w).Encode(params["id"])
 
 }
 
-func DeleteAllTask(w http.ResponseWriter, r *http.Request) {
+func (t TaskController) DeleteAllTask(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	count := database.DeleteAllTask()
+	count := t.db.DeleteAllTask()
 	json.NewEncoder(w).Encode(count)
 
 }
