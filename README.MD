@@ -3,7 +3,7 @@
 ### Para executar o projeto
 
 ```
-    docker-compose up
+docker-compose up
 ```
 Depois
 
@@ -11,7 +11,7 @@ Depois
 make dev-server
 ```
 
-#### Chamadas para os endpoints
+## Chamadas para os endpoints
 
 
 Para pegar as tasks
